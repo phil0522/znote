@@ -1,0 +1,5 @@
+package notesmarket
+
+func CreateNote() {
+
+}
