@@ -1,25 +1,30 @@
 package notesmarket
 
 import (
+	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/sirupsen/logrus"
 )
 
-// noteFile keep several notes in one markdown file
-type noteFile struct {
-	content string
-	notes   []Note
+// NoteFile keep several notes in one markdown file
+type NoteFile struct {
+	notePath string
+	content  string
+	notes    NoteSet
+	changed  bool
 }
 
-func (n *noteFile) load(notePath string) {
-	bytes, err := ioutil.ReadFile(notePath)
+func (n *NoteFile) load() {
+	bytes, err := ioutil.ReadFile(n.notePath)
 	if err != nil {
-		logrus.Fatalf("failed to read file %s", notePath)
+		logrus.Fatalf("failed to read file %s", n.notePath)
 	}
 	n.content = string(bytes)
-	n.notes = make([]Note, 0)
+	n.notes = NewNoteSet()
 
 	// Ignore the line with single #, which is the title of the file
 	// Start with first ##
@@ -30,20 +35,51 @@ func (n *noteFile) load(notePath string) {
 		// logrus.WithField("line", line).Info("Get line")
 		if strings.HasPrefix(line, "## ") {
 			if note.Title != "" {
-				n.notes = append(n.notes, note)
+				note.parseContent()
+				n.notes.upsertNode(note)
 			}
 			note = Note{}
 			note.Title = strings.Trim(string(line[3:]), "\n")
 			continue
 		}
 		note.Content = note.Content + line + "\n"
+
 	}
 	if note.Title != "" {
-		n.notes = append(n.notes, note)
+		note.parseContent()
+		n.notes.upsertNode(note)
 	}
-	logrus.WithField("notes", n.notes).Info("get notes")
+	logrus.WithField("path", n.notePath).WithField("notes", n.notes).Info("Loaded with notes")
 }
 
-func (n *noteFile) save(notePath string) {
+func (nf *NoteFile) save() {
+	logger := logrus.WithField("notefile", nf.notePath)
+	if !nf.changed {
+		logger.Info("No change, skip saving")
+		return
+	}
 
+	logger.Info("save")
+
+	notes := nf.notes.ToOrderedList()
+
+	baseDir, _ := filepath.Split(nf.notePath)
+	_ = os.MkdirAll(baseDir, 0755)
+	f, err := os.Create(nf.notePath)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	defer f.Close()
+	for _, note := range notes {
+		fmt.Fprintln(f, note.contentToSave())
+	}
+}
+
+func NewNoteFile(notePath string) *NoteFile {
+	logrus.WithField("notePath", notePath).Debug("new note file")
+	nf := &NoteFile{}
+	nf.notes = NewNoteSet()
+	nf.notePath = notePath
+	return nf
 }

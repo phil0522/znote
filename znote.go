@@ -17,7 +17,7 @@ func init() {
 	logrus.SetOutput(os.Stdout)
 
 	// Only log the warning severity or above.
-	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetLevel(logrus.InfoLevel)
 }
 
 const (
@@ -37,17 +37,16 @@ func main() {
 
 	switch os.Args[1] {
 	case "new":
-		subcommands.NewNoteCommandFlagSet.Parse(os.Args[2:])
-		break
+		_ = subcommands.NewNoteCommandFlagSet.Parse(os.Args[2:])
 	case "list":
-		subcommands.ListNoteCommandFlagSet.Parse(os.Args[2:])
+		_ = subcommands.ListNoteCommandFlagSet.Parse(os.Args[2:])
 	default:
 		fmt.Printf("%s is not a valid command\n", os.Args[1])
 		return
 	}
 
 	if subcommands.NewNoteCommandFlagSet.Parsed() {
-		logrus.Info("New Note")
+		subcommands.NewNote()
 	} else if subcommands.ListNoteCommandFlagSet.Parsed() {
 		subcommands.ListNote()
 	}

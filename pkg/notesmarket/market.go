@@ -3,6 +3,7 @@ package notesmarket
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -12,32 +13,30 @@ import (
 // multiple books, and each book may contains multiple notes.
 // Market is also responsible to serialize all notes to files and load them.
 type Market struct {
-	noteFiles map[string]noteFile
+	noteFiles map[string]*NoteFile
 	Books     map[string]*Book
 }
 
 var (
 	marketInstance = &Market{
-		noteFiles: make(map[string]noteFile),
+		noteFiles: make(map[string]*NoteFile),
 		Books:     make(map[string]*Book),
 	}
 )
 
-func (m *Market) getOrCreateBook(bookName string) *Book {
+func (m *Market) GetOrCreateBook(bookName string) *Book {
 	if book, ok := m.Books[bookName]; ok {
 		return book
 	}
-	book := &Book{}
+	book := NewBook()
 	book.Name = bookName
 	m.Books[book.Name] = book
 	return book
 }
 func (m *Market) SaveAll() {
-
-}
-
-func (m *Market) Load() {
-
+	for _, book := range m.Books {
+		book.saveToDisk()
+	}
 }
 
 func init() {
@@ -51,38 +50,60 @@ func (m *Market) loadAll() {
 			logrus.Fatalf("error reading file %s", path)
 			return nil
 		}
-		if info.IsDir() {
-			logrus.Debugf("directory %s is a directory, skipping", path)
+		if !isDataFile(path, info) {
 			return nil
 		}
 
-		if strings.HasSuffix(path, "README.md") || !strings.HasSuffix(path, ".md") {
-			logrus.WithField("path", path).Debug("Skip non markdown file")
+		nf := NewNoteFile(path)
+		nf.load()
+
+		bookName := getBookName(path)
+		if bookName == "" {
 			return nil
 		}
+		book := m.GetOrCreateBook(bookName)
 
-		relativePath, err := filepath.Rel(RootDir, path)
-		if err != nil {
-			logrus.WithField("base", RootDir).WithField("path", path).Fatal("calculate relative path failed")
-			return nil
-		}
-		fileSegments := strings.Split(relativePath, string(filepath.Separator))
-		if len(fileSegments) == 1 {
-			logrus.WithField("path", fileSegments).Info("skip file under root")
-		}
-
-		nf := noteFile{}
-		nf.load(path)
-		m.noteFiles[path] = nf
-
-		book := m.getOrCreateBook(fileSegments[0])
-		book.Notes = append(book.Notes, nf.notes...)
+		book.noteFiles[path] = nf
+		book.Notes.mergeNoteSet(nf.notes)
 		return nil
 	})
 
 	if err != nil {
 		logrus.Fatalf("failed to walk")
 	}
+}
+
+var (
+	validBaseName = regexp.MustCompile(`^[0-9]*.md$`)
+)
+
+func isDataFile(path string, info os.FileInfo) bool {
+	if info.IsDir() {
+		logrus.Debugf("directory %s is a directory, skipping", path)
+		return false
+	}
+
+	if validBaseName.MatchString(info.Name()) {
+		return true
+	}
+
+	logrus.WithField("path", path).Infof("Not an expected data file")
+	return false
+}
+
+func getBookName(path string) string {
+	relativePath, err := filepath.Rel(RootDir, path)
+	if err != nil {
+		logrus.WithField("path", path).Fatal("Failed to calculate relative path")
+		return ""
+	}
+
+	fileSegments := strings.Split(relativePath, string(filepath.Separator))
+	if len(fileSegments) == 1 {
+		logrus.WithField("path", path).Fatal("file is under the root, no book assigned")
+		return ""
+	}
+	return fileSegments[0]
 }
 
 func GetNotesMarket() *Market {
