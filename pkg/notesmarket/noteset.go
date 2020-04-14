@@ -16,7 +16,7 @@ func NewNoteSet() NoteSet {
 	}
 }
 
-func (ns *NoteSet) hasNoteByCreationTime(key string) bool {
+func (ns *NoteSet) HasNoteByCreationTime(key string) bool {
 	_, ok := ns.notes[key]
 	return ok
 }
@@ -53,4 +53,13 @@ func (ns *NoteSet) ToOrderedList() []*Note {
 		i -= 1
 	}
 	return r
+}
+
+func (ns *NoteSet) GetNote(key string) Note {
+	v, ok := ns.notes[key]
+	if ok {
+		return *v
+	}
+	logrus.WithField("note", key).Fatal("can not find note")
+	return EmptyNote()
 }
