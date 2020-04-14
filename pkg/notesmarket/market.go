@@ -44,7 +44,7 @@ func init() {
 }
 
 func (m *Market) loadAll() {
-	logrus.WithField("root", RootDir).Warn("load whole note market")
+	logrus.WithField("root", RootDir).Debug("load whole note market")
 	err := filepath.Walk(RootDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			logrus.Fatalf("error reading file %s", path)

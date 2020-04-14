@@ -2,6 +2,7 @@ package subcommands
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/phil0522/znote/pkg/notesmarket"
 	"github.com/sirupsen/logrus"
@@ -12,12 +13,12 @@ var (
 )
 
 func ListNote() {
-	logrus.Info("List Note")
+	logrus.Debug("List Note")
 	market := notesmarket.GetNotesMarket()
 	for k, v := range market.Books {
-		logrus.WithField("book", k).Info("Book")
+		logrus.WithField("book", k).Debug("Book")
 		for _, note := range v.Notes.ToOrderedList() {
-			logrus.WithField("title", note.Title).WithField("CreationTime", note.CreationTime).Infof("note")
+			fmt.Printf("%s,%s,%s\n", k, note.CreationTime, note.Title)
 		}
 	}
 }

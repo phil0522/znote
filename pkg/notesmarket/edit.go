@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -48,6 +49,9 @@ func openFileInEditor(filename string) error {
 	}
 
 	cmd := exec.Command(executable, filename)
+	if strings.Contains(executable, "Visual Studio Code") || strings.Contains(executable, "vscode") {
+		cmd = exec.Command(executable, "--wait", filename)
+	}
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

@@ -42,6 +42,8 @@ func main() {
 		_ = subcommands.ListNoteCommandFlagSet.Parse(os.Args[2:])
 	case "edit":
 		_ = subcommands.EditNoteCommandFlagSet.Parse(os.Args[2:])
+	case "pick":
+		_ = subcommands.PickNoteCommandFlagSet.Parse(os.Args[2:])
 	default:
 		fmt.Printf("%s is not a valid command\n", os.Args[1])
 		return
@@ -53,5 +55,7 @@ func main() {
 		subcommands.ListNote()
 	} else if subcommands.EditNoteCommandFlagSet.Parsed() {
 		subcommands.EditNote()
+	} else if subcommands.PickNoteCommandFlagSet.Parsed() {
+		subcommands.PickNoteForEdit()
 	}
 }

@@ -75,7 +75,7 @@ func (n *Note) updateFromPropertiesLine(line string) {
 
 	fields := strings.SplitN(line, "=", 2)
 
-	logrus.WithField("field", fields).Info("get Fields")
+	logrus.WithField("field", fields).Debug("get Fields")
 	key := strings.TrimSpace(fields[0])
 	value := strings.TrimSpace(fields[1])
 

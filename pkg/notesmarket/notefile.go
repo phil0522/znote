@@ -49,7 +49,7 @@ func (n *NoteFile) load() {
 		note.parseContent()
 		n.notes.upsertNode(note)
 	}
-	logrus.WithField("path", n.notePath).WithField("notes", n.notes).Info("Loaded with notes")
+	logrus.WithField("path", n.notePath).WithField("notes", n.notes).Debug("Loaded with notes")
 }
 
 func (nf *NoteFile) save() {
