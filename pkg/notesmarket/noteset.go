@@ -1,6 +1,8 @@
 package notesmarket
 
 import (
+	"sort"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -43,6 +45,7 @@ func (ns *NoteSet) ToOrderedList() []*Note {
 	for k := range ns.notes {
 		keys = append(keys, k)
 	}
+	sort.Strings(keys)
 
 	i := len(keys) - 1
 	for i >= 0 {

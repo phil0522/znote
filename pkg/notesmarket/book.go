@@ -18,9 +18,19 @@ func NewBook() *Book {
 		noteFiles: make(map[string]*NoteFile),
 	}
 }
-func (b *Book) RemoveNote(n Note) {
-
+func (b *Book) RemoveNote(n *Note) {
+	notePath := b.getFilePathFromCreationTime(n.CreationTime)
+	nf := b.noteFiles[notePath]
+	nf.notes.removeNoteByKey(n.CreationTime)
+	b.Notes.removeNoteByKey(n.CreationTime)
 }
+
+func (b *Book) EditNote(n Note) {
+	updated := editNote(&n)
+	b.RemoveNote(&n)
+	b.AddNote(*updated)
+}
+
 func (b *Book) AddNote(n Note) {
 	logrus.WithField("book", b.Name).WithField("note", n).Info("Add new Note")
 	notePath := b.getFilePathFromCreationTime(n.CreationTime)
@@ -30,8 +40,9 @@ func (b *Book) AddNote(n Note) {
 	}
 	nf.notes.upsertNode(n)
 	nf.changed = true
-
 	b.noteFiles[notePath] = nf
+
+	b.Notes.upsertNode(n)
 }
 
 func (b *Book) saveToDisk() {
