@@ -83,7 +83,13 @@ func (n *Note) updateFromPropertiesLine(line string) {
 	case "created":
 		n.CreationTime = value
 	case "tags":
-		n.Tags = strings.Split(value, ",")
+		fields = strings.Split(value, ",")
+		for _, field := range fields {
+			tag := strings.TrimSpace(field)
+			if tag != "" {
+				n.Tags = append(n.Tags, tag)
+			}
+		}
 	case "project":
 		n.Project = value
 	case "status":

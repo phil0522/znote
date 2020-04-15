@@ -32,6 +32,6 @@ func updateToc() {
 
 	for name, book := range market.Books {
 		fmt.Fprintln(f, name)
-		book.UpdateBookToc()
+		book.UpdateBook()
 	}
 }

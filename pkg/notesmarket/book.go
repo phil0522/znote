@@ -64,7 +64,7 @@ func (b *Book) saveToDisk() {
 	}
 }
 
-func (b *Book) UpdateBookToc() {
+func (b *Book) UpdateBook() {
 	f, err := os.Create(filepath.Join(RootDir, b.Name, b.Name+".toc"))
 
 	if err != nil {
@@ -72,20 +72,16 @@ func (b *Book) UpdateBookToc() {
 	}
 	defer f.Close()
 
-	first := true
+	fmt.Fprintln(f, "ByMonth,")
 	for name := range b.noteFiles {
 		relName := b.getRelPath(name)
-		if first {
-			fmt.Fprintf(f, "%s,\n", getBaseDirectory(relName))
-			first = false
-		}
-		fmt.Fprintf(f, "%s,%s", relName, titleForPath(relName))
+		fmt.Fprintf(f, "%s,%s\n", relName, titleForPath(relName))
 	}
-}
 
-func getBaseDirectory(p string) string {
-	base, _ := filepath.Split(p)
-	return strings.TrimRight(base, "/")
+	fmt.Fprintln(f, "ByTag,")
+	for tag := range b.UpdateTags() {
+		fmt.Fprintf(f, "ByTag/%s.md,%s\n", tag, tag)
+	}
 }
 
 func (b *Book) getRelPath(p string) string {
@@ -109,4 +105,25 @@ func titleForPath(path string) string {
 		return yearMonth.Format("2006 January")
 	}
 	return "Not Supported"
+}
+
+func (b *Book) UpdateTags() map[string][]*Note {
+	noteByTags := make(map[string][]*Note)
+
+	for _, note := range b.Notes.notes {
+		if note.Archived {
+			continue
+		}
+		for _, tag := range note.Tags {
+			noteByTags[tag] = append(noteByTags[tag], note)
+		}
+	}
+
+	for tag, notes := range noteByTags {
+		noteFile := NewNoteFile(filepath.Join(RootDir, b.Name, "ByTag", strings.ToLower(tag)+".md"))
+		noteFile.notes.mergeNotes(notes)
+		noteFile.changed = true
+		noteFile.save()
+	}
+	return noteByTags
 }

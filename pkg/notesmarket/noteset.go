@@ -27,6 +27,12 @@ func (ns *NoteSet) mergeNoteSet(other NoteSet) {
 	}
 }
 
+func (ns *NoteSet) mergeNotes(notes []*Note) {
+	for _, n := range notes {
+		ns.notes[n.CreationTime] = n
+	}
+}
+
 func (ns *NoteSet) removeNoteByKey(key string) {
 	delete(ns.notes, key)
 }
