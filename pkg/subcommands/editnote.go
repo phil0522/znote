@@ -2,8 +2,10 @@ package subcommands
 
 import (
 	"flag"
+	"strings"
 
 	"github.com/phil0522/znote/pkg/notesmarket"
+	pb "github.com/phil0522/znote/proto"
 	"github.com/sirupsen/logrus"
 )
 
@@ -11,16 +13,33 @@ var (
 	EditNoteCommandFlagSet = flag.NewFlagSet("Edit", flag.ExitOnError)
 )
 
-func EditNote() {
-	logrus.Info("List Note")
+func CreateEditNoteRequest() pb.ZNoteRequest {
+	if EditNoteCommandFlagSet.NArg() == 0 {
+		logrus.Panic("need note id")
+	}
+
+	return pb.ZNoteRequest{
+		Command: "edit",
+		NoteId:  EditNoteCommandFlagSet.Arg(0),
+	}
+}
+
+func ResolveEditNote(req pb.ZNoteRequest) pb.ZNoteResponse {
+	noteId := req.NoteId
+
 	market := notesmarket.GetNotesMarket()
 
-	book := market.GetOrCreateBook(EditNoteCommandFlagSet.Arg(0))
+	sb := &strings.Builder{}
+	for _, book := range market.Books {
+		if book.Notes.HasNoteById(noteId) {
+			note := book.Notes.GetNote(noteId)
+			book.EditNote(note)
 
-	noteId := EditNoteCommandFlagSet.Arg(1)
+			market.SaveAll()
+		}
+	}
 
-	note := book.Notes.GetNote(noteId)
-	book.EditNote(note)
-
-	market.SaveAll()
+	return pb.ZNoteResponse{
+		Result: sb.String(),
+	}
 }

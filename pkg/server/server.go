@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-// ZNoteServer serve the snippet service.
+// ZNoteServer serve the znote service.
 type ZNoteServer struct {
 	GrpcServer *grpc.Server
 	serveCount int32
@@ -20,7 +20,7 @@ type ZNoteServer struct {
 
 // Initialize initialize the server
 func (s *ZNoteServer) Initialize() {
-	logrus.Debug("initialize snippet manger.")
+	logrus.Debug("initialize znote manger.")
 	s.market = notesmarket.GetNotesMarket()
 }
 
