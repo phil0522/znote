@@ -20,7 +20,7 @@ func ShowNote() {
 
 	book := market.GetOrCreateBook(bookName)
 
-	if book.Notes.HasNoteByCreationTime(noteId) {
+	if book.Notes.HasNoteById(noteId) {
 		note := book.Notes.GetNote(noteId)
 		fmt.Printf("## %s\n@%s\n%s\n", note.Title, strings.Join(note.Tags, ", "), note.Content)
 	}

@@ -10,6 +10,7 @@ import (
 
 // Note is the basic unit of the notes system.
 type Note struct {
+	Id           string
 	Title        string
 	Content      string
 	Project      string
@@ -20,15 +21,9 @@ type Note struct {
 
 func EmptyNote() Note {
 	return Note{
+		Id:           generateNextId(),
 		CreationTime: time.Now().Format(time.RFC3339),
 	}
-}
-func (n *Note) copyFrom(other Note) {
-	n.Title = other.Title
-	n.Content = other.Content
-	n.Project = other.Project
-	n.Tags = other.Tags
-	n.Archived = other.Archived
 }
 
 const (
@@ -44,14 +39,19 @@ func (n *Note) parseContent() {
 			continue
 		}
 		if stage == "header" {
+			line = strings.TrimSpace(line)
 			if strings.HasPrefix(line, "-->") {
 				stage = "body"
 				continue
 			}
-			if strings.HasPrefix(line, "<!--") {
+			if line == "" || strings.HasPrefix(line, "<!--") {
 				continue
 			}
-			n.updateFromPropertiesLine(line)
+			if strings.HasPrefix(line, znoteLinePrefix) {
+				n.updateFromPropertiesLine(line)
+			} else {
+				stage = "body"
+			}
 		}
 		if stage == "body" {
 			realContent = append(realContent, line)
@@ -59,10 +59,13 @@ func (n *Note) parseContent() {
 	}
 
 	n.Content = strings.Join(realContent, "")
+
+	if n.Id == "" {
+		n.Id = generateNextId()
+	}
 }
 
 func (n *Note) updateFromPropertiesLine(line string) {
-	line = strings.TrimSpace(line)
 	if line == "" {
 		return
 	}
@@ -80,6 +83,8 @@ func (n *Note) updateFromPropertiesLine(line string) {
 	value := strings.TrimSpace(fields[1])
 
 	switch key {
+	case "id":
+		n.Id = value
 	case "created":
 		n.CreationTime = value
 	case "tags":
@@ -98,8 +103,7 @@ func (n *Note) updateFromPropertiesLine(line string) {
 			n.Archived = true
 		}
 	default:
-		logrus.WithField("field", fields).Warn("unknown keys")
-		panic("unknown keys")
+		logrus.WithField("field", fields).Panic("unknown keys")
 	}
 }
 
@@ -109,11 +113,12 @@ func (n *Note) headerText() string {
 		status = "archived"
 	}
 	return fmt.Sprintf(`<!--
+znote: id=%s
 znote: created=%s
 znote: project=%s
 znote: tags=%s
 znote: status=%s
--->`, n.CreationTime, n.Project, strings.Join(n.Tags, ","), status)
+-->`, n.Id, n.CreationTime, n.Project, strings.Join(n.Tags, ","), status)
 }
 
 func (n *Note) contentToSave() string {

@@ -29,8 +29,8 @@ func NewBook() *Book {
 func (b *Book) RemoveNote(n *Note) {
 	notePath := b.getFilePathFromCreationTime(n.CreationTime)
 	nf := b.noteFiles[notePath]
-	nf.notes.removeNoteByKey(n.CreationTime)
-	b.Notes.removeNoteByKey(n.CreationTime)
+	nf.notes.removeNoteByKey(n.Id)
+	b.Notes.removeNoteByKey(n.Id)
 }
 
 func (b *Book) EditNote(n Note) bool {

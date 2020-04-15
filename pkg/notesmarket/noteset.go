@@ -16,7 +16,7 @@ func NewNoteSet() NoteSet {
 	}
 }
 
-func (ns *NoteSet) HasNoteByCreationTime(key string) bool {
+func (ns *NoteSet) HasNoteById(key string) bool {
 	_, ok := ns.notes[key]
 	return ok
 }
@@ -29,7 +29,7 @@ func (ns *NoteSet) mergeNoteSet(other NoteSet) {
 
 func (ns *NoteSet) mergeNotes(notes []*Note) {
 	for _, n := range notes {
-		ns.notes[n.CreationTime] = n
+		ns.notes[n.Id] = n
 	}
 }
 
@@ -38,10 +38,10 @@ func (ns *NoteSet) removeNoteByKey(key string) {
 }
 
 func (ns *NoteSet) upsertNode(note Note) {
-	if note.CreationTime == "" {
+	if note.Id == "" {
 		logrus.WithField("note", note).Panic("Empty Note Key")
 	}
-	ns.notes[note.CreationTime] = &note
+	ns.notes[note.Id] = &note
 }
 
 func (ns *NoteSet) ToOrderedList() []*Note {

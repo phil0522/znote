@@ -51,7 +51,7 @@ func invokeFzfAndGetBookNoteId() (bookName string, noteId string) {
 	for k, v := range market.Books {
 		logrus.WithField("book", k).Debug("Book")
 		for _, note := range v.Notes.ToOrderedList() {
-			fmt.Fprintf(pipeInput, "%s,%s,%s\n", k, note.CreationTime, note.Title)
+			fmt.Fprintf(pipeInput, "%s,%s,%s\n", k, note.Id, note.Title)
 		}
 	}
 

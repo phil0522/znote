@@ -18,7 +18,7 @@ func ListNote() {
 	for k, v := range market.Books {
 		logrus.WithField("book", k).Debug("Book")
 		for _, note := range v.Notes.ToOrderedList() {
-			fmt.Printf("%s,%s,%s\n", k, note.CreationTime, note.Title)
+			fmt.Printf("%s,%s,%s\n", k, note.Id, note.Title)
 		}
 	}
 }
