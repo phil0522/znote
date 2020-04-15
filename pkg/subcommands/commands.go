@@ -29,7 +29,7 @@ var (
 		makeSubCommand("edit", EditNoteCommandFlagSet, CreateEditNoteRequest, ResolveEditNote),
 		makeSubCommand("pick", PickNoteCommandFlagSet, CreatePickNoteRequest, ResolvePickNote),
 		// makeSubCommand("serve", subcommands.ServeCommandFlagSet, subcommands.ServeHttp),
-		// makeSubCommand("refresh", subcommands.RefreshCommandFlagSet, subcommands.RefreshNotes),
+		makeSubCommand("refresh", RefreshCommandFlagSet, CreateRefreshMarketRequest, ResolveRefreshMarket),
 		makeSubCommand("show", ShowNoteCommandFlagSet, CreateShowNoteRequest, ResolveShowNote),
 	}
 )

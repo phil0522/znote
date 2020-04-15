@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/phil0522/znote/pkg/notesmarket"
+	pb "github.com/phil0522/znote/proto"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,9 +15,15 @@ var (
 	RefreshCommandFlagSet = flag.NewFlagSet("Refresh", flag.ExitOnError)
 )
 
-func RefreshNotes() {
-	logrus.Debug("Refresh notes to get latest state.")
-	updateToc()
+func CreateRefreshMarketRequest() pb.ZNoteRequest {
+	return pb.ZNoteRequest{
+		Command: "refresh",
+	}
+}
+func ResolveRefreshMarket(req pb.ZNoteRequest) pb.ZNoteResponse {
+	logrus.Debug("Refresh Market")
+	go updateToc()
+	return pb.ZNoteResponse{}
 }
 
 func updateToc() {
