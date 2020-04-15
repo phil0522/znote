@@ -32,7 +32,7 @@ func ServeHttp() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		logrus.WithField("path", r.URL.Path).Info("Get request")
+		logrus.WithField("path", r.URL.Path).Debug("Get request")
 		path := r.URL.Path
 		if path == "/" {
 			path = "/index.html"

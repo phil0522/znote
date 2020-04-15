@@ -37,7 +37,7 @@ func PickNoteForEdit() {
 func invokeFzfAndGetBookNoteId() (bookName string, noteId string) {
 	market := notesmarket.GetNotesMarket()
 
-	cmd := exec.Command("fzf", "--height", "50%", "--border", "-d,", "--preview", "printf %s\\\\n%s\\\\n%s {1} {2} {3..}", "--color", "fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229")
+	cmd := exec.Command("fzf", "--height", "50%", "--border", "-d,", "--preview", "znote show {1} {2}", "--color", "fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229")
 
 	pipeInput, err := cmd.StdinPipe()
 	if err != nil {
