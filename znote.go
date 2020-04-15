@@ -28,7 +28,7 @@ func init() {
 	logrus.SetOutput(os.Stdout)
 
 	// Only log the warning severity or above.
-	logrus.SetLevel(logrus.WarnLevel)
+	logrus.SetLevel(logrus.DebugLevel)
 }
 
 const (
@@ -45,10 +45,6 @@ edit: edit a note directly
 const (
 	serverAddr = "127.0.0.1:6399"
 )
-
-func executeSubCommand(ctx context.Context, client pb.ZNoteServiceClient) {
-
-}
 
 func killServer(ctx context.Context, client pb.ZNoteServiceClient) {
 	_, err := client.QuitServer(ctx, &pb.QuitServerRequest{})

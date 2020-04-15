@@ -30,6 +30,6 @@ var (
 		// makeSubCommand("pick", subcommands.PickNoteCommandFlagSet, subcommands.PickNoteForEdit),
 		// makeSubCommand("serve", subcommands.ServeCommandFlagSet, subcommands.ServeHttp),
 		// makeSubCommand("refresh", subcommands.RefreshCommandFlagSet, subcommands.RefreshNotes),
-		// makeSubCommand("show", subcommands.ShowNoteCommandFlagSet, subcommands.ShowNote),
+		makeSubCommand("show", ShowNoteCommandFlagSet, CreateShowNoteRequest, ResolveShowNote),
 	}
 )
