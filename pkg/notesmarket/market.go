@@ -87,7 +87,7 @@ func isDataFile(path string, info os.FileInfo) bool {
 		return true
 	}
 
-	logrus.WithField("path", path).Infof("Not an expected data file")
+	logrus.WithField("path", path).Debug("Not an expected data file")
 	return false
 }
 

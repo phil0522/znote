@@ -28,9 +28,10 @@ func PickNoteForEdit() {
 
 	book := market.GetOrCreateBook(bookName)
 	note := book.Notes.GetNote(noteId)
-	book.EditNote(note)
 
-	market.SaveAll()
+	if book.EditNote(note) {
+		market.SaveAll()
+	}
 }
 
 func invokeFzfAndGetBookNoteId() (bookName string, noteId string) {

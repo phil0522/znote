@@ -12,20 +12,23 @@ var NewNoteCommandFlagSet = flag.NewFlagSet("NewNote", flag.ExitOnError)
 
 func NewNote() {
 	bookName := NewNoteCommandFlagSet.Arg(0)
-	logrus.WithField("book", bookName).Info("Create Note")
+	logrus.WithField("book", bookName).WithField("args", NewNoteCommandFlagSet.Args()).Info("Create Note")
 	market := notesmarket.GetNotesMarket()
 	book := market.GetOrCreateBook(bookName)
 
 	var n notesmarket.Note
 	if NewNoteCommandFlagSet.NArg() == 1 {
 		n = notesmarket.EmptyNote()
-		n.Title = "Test 1"
+		n.Title = ""
 	} else {
 		n = newNoteWithTemplate(NewNoteCommandFlagSet.Arg(1))
 	}
 	book.AddNote(n)
-	book.EditNote(n)
-	market.SaveAll()
+	if book.EditNote(n) {
+		market.SaveAll()
+	} else {
+		book.RemoveNote(&n)
+	}
 }
 
 func newNoteWithTemplate(templateName string) notesmarket.Note {

@@ -23,12 +23,11 @@ func editNote(note *Note) *Note {
 		logrus.WithField("path", nf.notePath).Panic("Error edit notes")
 	}
 	nf.load()
-
+	_ = os.Remove(nf.notePath)
 	if len(nf.notes.notes) != 1 {
 		logrus.Info("invalid input format, discard change")
+		return nil
 	}
-
-	_ = os.Remove(nf.notePath)
 	return nf.notes.ToOrderedList()[0]
 }
 

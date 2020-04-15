@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -25,8 +26,35 @@ const (
 
 command can be of
 new: create a new note
-ls: list all notes
+list: list all notes
+pick: pick a note and edit it
+edit: edit a note directly
 `
+)
+
+type subCommand struct {
+	name    string
+	flagset *flag.FlagSet
+	method  func()
+}
+
+func makeSubCommand(name string, flagset *flag.FlagSet, method func()) subCommand {
+	return subCommand{
+		name:    name,
+		flagset: flagset,
+		method:  method,
+	}
+}
+
+var (
+	commands = []subCommand{
+		makeSubCommand("new", subcommands.NewNoteCommandFlagSet, subcommands.NewNote),
+		makeSubCommand("list", subcommands.ListNoteCommandFlagSet, subcommands.ListNote),
+		makeSubCommand("edit", subcommands.EditNoteCommandFlagSet, subcommands.EditNote),
+		makeSubCommand("pick", subcommands.PickNoteCommandFlagSet, subcommands.PickNoteForEdit),
+		makeSubCommand("serve", subcommands.ServeCommandFlagSet, subcommands.ServeHttp),
+		makeSubCommand("refresh", subcommands.RefreshCommandFlagSet, subcommands.RefreshNotes),
+	}
 )
 
 func main() {
@@ -35,27 +63,16 @@ func main() {
 		return
 	}
 
-	switch os.Args[1] {
-	case "new":
-		_ = subcommands.NewNoteCommandFlagSet.Parse(os.Args[2:])
-	case "list":
-		_ = subcommands.ListNoteCommandFlagSet.Parse(os.Args[2:])
-	case "edit":
-		_ = subcommands.EditNoteCommandFlagSet.Parse(os.Args[2:])
-	case "pick":
-		_ = subcommands.PickNoteCommandFlagSet.Parse(os.Args[2:])
-	default:
-		fmt.Printf("%s is not a valid command\n", os.Args[1])
-		return
+	logrus.WithField("args", os.Args[2:]).Info("params")
+	for _, command := range commands {
+		if command.name == os.Args[1] {
+			err := command.flagset.Parse(os.Args[2:])
+			if err != nil {
+				logrus.WithError(err).Panic("parse flag failure.")
+			}
+			command.method()
+			return
+		}
 	}
-
-	if subcommands.NewNoteCommandFlagSet.Parsed() {
-		subcommands.NewNote()
-	} else if subcommands.ListNoteCommandFlagSet.Parsed() {
-		subcommands.ListNote()
-	} else if subcommands.EditNoteCommandFlagSet.Parsed() {
-		subcommands.EditNote()
-	} else if subcommands.PickNoteCommandFlagSet.Parsed() {
-		subcommands.PickNoteForEdit()
-	}
+	fmt.Printf("%s is not a valid command\n", os.Args[1])
 }

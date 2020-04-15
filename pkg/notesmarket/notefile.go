@@ -63,14 +63,21 @@ func (nf *NoteFile) save() {
 
 	notes := nf.notes.ToOrderedList()
 
-	baseDir, _ := filepath.Split(nf.notePath)
+	baseDir, fileName := filepath.Split(nf.notePath)
 	_ = os.MkdirAll(baseDir, 0755)
 	f, err := os.Create(nf.notePath)
 	if err != nil {
 		panic(err.Error())
 	}
 
+	fileName = strings.ReplaceAll(fileName, ".md", "")
+
 	defer f.Close()
+
+	// Edit.md is used to create temporary md file.
+	if fileName != "edit" {
+		fmt.Fprintf(f, "# %s\n\n", fileName)
+	}
 	for _, note := range notes {
 		fmt.Fprintln(f, note.contentToSave())
 	}
