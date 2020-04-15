@@ -20,7 +20,8 @@ func editNote(note *Note) *Note {
 
 	err := openFileInEditor(nf.notePath)
 	if err != nil {
-		logrus.WithField("path", nf.notePath).Panic("Error edit notes")
+		logrus.WithField("path", nf.notePath).Warning("Error edit notes")
+		return nil
 	}
 	nf.load()
 	_ = os.Remove(nf.notePath)

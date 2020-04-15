@@ -30,12 +30,15 @@ func ResolveNewNote(request pb.ZNoteRequest) pb.ZNoteResponse {
 	book := market.GetOrCreateBook(bookName)
 
 	var n notesmarket.Note = newNoteWithTemplate(*template)
-	book.AddNote(n)
-	if book.EditNote(n) {
-		market.SaveAll()
-	} else {
-		book.RemoveNote(&n)
-	}
+
+	go func() {
+		book.AddNote(n)
+		if book.EditNote(n) {
+			market.SaveAll()
+		} else {
+			book.RemoveNote(&n)
+		}
+	}()
 	return pb.ZNoteResponse{}
 }
 
