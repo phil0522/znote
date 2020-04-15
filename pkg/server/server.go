@@ -42,6 +42,7 @@ func (s *ZNoteServer) QuitServer(ctx context.Context, in *pb.QuitServerRequest) 
 	go func() {
 		time.Sleep(time.Second * 1)
 		s.GrpcServer.Stop()
+		subcommands.ShutDownHttpServer()
 	}()
 	return &pb.QuitServerResponse{}, nil
 }

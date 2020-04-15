@@ -9,8 +9,10 @@ import (
 	"strings"
 
 	"github.com/phil0522/znote/pkg/notesmarket"
+	pb "github.com/phil0522/znote/proto"
 	"github.com/rakyll/statik/fs"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/net/context"
 
 	_ "github.com/phil0522/znote/statik"
 )
@@ -19,8 +21,40 @@ var (
 	ServeCommandFlagSet = flag.NewFlagSet("Edit", flag.ExitOnError)
 )
 
+func CreateServeRequest() pb.ZNoteRequest {
+	return pb.ZNoteRequest{
+		Command: "serve",
+	}
+}
+
+var (
+	serverStarted              = false
+	httpServer    *http.Server = nil
+)
+
+func ShutDownHttpServer() {
+	if httpServer != nil {
+		_ = httpServer.Shutdown(context.Background())
+		httpServer = nil
+	}
+}
+
+func ResolveServe(req pb.ZNoteRequest) pb.ZNoteResponse {
+	if serverStarted {
+		return pb.ZNoteResponse{
+			Result: "Server is already started",
+		}
+	}
+	go ServeHttp()
+
+	return pb.ZNoteResponse{
+		Result: "server is starting.",
+	}
+}
+
 func ServeHttp() {
 	logrus.Info("Serve HTTP")
+	serverStarted = true
 
 	if err := os.Chdir(notesmarket.RootDir); err != nil {
 		logrus.WithField("md-root", notesmarket.RootDir).Panic("can not change directory")
@@ -32,14 +66,15 @@ func ServeHttp() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		logrus.WithField("path", r.URL.Path).Debug("Get request")
+
 		path := r.URL.Path
 		if path == "/" {
 			path = "/index.html"
 		}
-		file, err := box.Open(r.URL.Path)
+		logrus.WithField("path", path).Debug("Get request")
+		file, err := box.Open(path)
 		if err != nil {
-			logrus.WithField("path", r.URL.Path).Debug("not exist, use html.")
+			logrus.WithField("path", path).Debug("not exist, use html.")
 			file, err = box.Open("/index.html")
 			path = "/index.html"
 
@@ -67,7 +102,9 @@ func ServeHttp() {
 		_, _ = w.Write(content)
 	})
 	http.Handle("/md/", http.StripPrefix("/md/", http.FileServer(http.Dir(notesmarket.RootDir))))
-	if err := http.ListenAndServe(":3000", nil); err != nil {
+	httpServer = &http.Server{Addr: ":3000", Handler: nil}
+
+	if err := httpServer.ListenAndServe(); err != nil {
 		logrus.Panic("can not serve")
 	}
 }
