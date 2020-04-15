@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package phil0522.znote;
+
+message ZNoteRequest {
+  string command = 1;
+  string book = 2;
+  string note_id = 3;
+}
+
+message ZNoteResponse {
+  string result = 1;
+}
+
+message QuitServerRequest {}
+message QuitServerResponse {}
+
+service ZNoteService {
+  rpc ExecuteCommand(ZNoteRequest) returns (ZNoteResponse) {}
+
+  rpc QuitServer(QuitServerRequest) returns (QuitServerResponse) {}
+}
