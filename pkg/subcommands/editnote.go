@@ -32,10 +32,11 @@ func ResolveEditNote(req pb.ZNoteRequest) pb.ZNoteResponse {
 	sb := &strings.Builder{}
 	for _, book := range market.Books {
 		if book.Notes.HasNoteById(noteId) {
-			note := book.Notes.GetNote(noteId)
-			book.EditNote(note)
-
-			market.SaveAll()
+			go func() {
+				note := book.Notes.GetNote(noteId)
+				book.EditNote(note)
+				market.SaveAll()
+			}()
 		}
 	}
 

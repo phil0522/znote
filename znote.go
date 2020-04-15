@@ -25,7 +25,7 @@ func init() {
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
-	logrus.SetOutput(os.Stdout)
+	logrus.SetOutput(os.Stderr)
 
 	// Only log the warning severity or above.
 	logrus.SetLevel(logrus.DebugLevel)
@@ -88,7 +88,6 @@ func serve() {
 }
 
 func executeNoteRequest(ctx context.Context, client pb.ZNoteServiceClient) {
-	logrus.WithField("args", os.Args[2:]).Info("params")
 	for _, command := range subcommands.Commands {
 		if command.Name == os.Args[1] {
 			err := command.Flagset.Parse(os.Args[2:])
@@ -96,6 +95,10 @@ func executeNoteRequest(ctx context.Context, client pb.ZNoteServiceClient) {
 				logrus.WithError(err).Panic("parse flag failure.")
 			}
 			req := command.NewRequest()
+			if req.Command == "" {
+				logrus.Debug("empty command, doing nothing")
+				return
+			}
 			resp, err := client.ExecuteCommand(ctx, &req)
 			if err != nil {
 				logrus.WithError(err).WithField("req", req).Panic("Failed to execute request")

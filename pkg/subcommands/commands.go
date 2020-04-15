@@ -27,7 +27,7 @@ var (
 		makeSubCommand("new", NewNoteCommandFlagSet, NewNoteCreateRequest, ResolveNewNote),
 		makeSubCommand("list", ListNoteCommandFlagSet, CreateListNoteRequest, ResolveListNote),
 		makeSubCommand("edit", EditNoteCommandFlagSet, CreateEditNoteRequest, ResolveEditNote),
-		// makeSubCommand("pick", subcommands.PickNoteCommandFlagSet, subcommands.PickNoteForEdit),
+		makeSubCommand("pick", PickNoteCommandFlagSet, CreatePickNoteRequest, ResolvePickNote),
 		// makeSubCommand("serve", subcommands.ServeCommandFlagSet, subcommands.ServeHttp),
 		// makeSubCommand("refresh", subcommands.RefreshCommandFlagSet, subcommands.RefreshNotes),
 		makeSubCommand("show", ShowNoteCommandFlagSet, CreateShowNoteRequest, ResolveShowNote),
