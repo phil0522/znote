@@ -75,7 +75,7 @@ func (b *Book) UpdateBook() {
 	fmt.Fprintln(f, "ByMonth,")
 	for name := range b.noteFiles {
 		relName := b.getRelPath(name)
-		fmt.Fprintf(f, "%s,%s\n", relName, titleForPath(relName))
+		fmt.Fprintf(f, "%s,%s\n", relName, titleForByMonthPath(relName))
 	}
 
 	fmt.Fprintln(f, "ByTag,")
@@ -93,7 +93,7 @@ func (b *Book) getRelPath(p string) string {
 	return relPath
 }
 
-func titleForPath(path string) string {
+func titleForByMonthPath(path string) string {
 	_, fileName := filepath.Split(path)
 	baseName := strings.Split(fileName, ".")[0]
 

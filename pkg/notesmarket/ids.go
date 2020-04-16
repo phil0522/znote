@@ -27,7 +27,7 @@ func init() {
 	}
 
 	nextId = cfg.Section("notes").Key("nextId").MustInt(100000)
-	logrus.WithField("nextId", nextId).Info("initialize nextId")
+	logrus.WithField("nextId", nextId).Debug("initialize nextId")
 }
 
 func generateNextId() string {

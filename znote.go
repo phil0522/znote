@@ -134,13 +134,13 @@ func main() {
 	}
 	child, _ := context.Search()
 	if child != nil {
-		logrus.Info("Server has been already serving")
+		logrus.Debug("Server has been already serving")
 		executeCommand()
 		return
 	}
 
 	if len(os.Args) >= 2 && os.Args[1] == "kill-server" {
-		logrus.Info("server is not running, doing nothing")
+		logrus.Debug("server is not running, doing nothing")
 		return
 	}
 

@@ -12,24 +12,24 @@ import (
 var NewNoteCommandFlagSet = flag.NewFlagSet("NewNote", flag.ExitOnError)
 
 var (
-	bookFlag = NewNoteCommandFlagSet.String("b", "work", "the book where note is created.")
-	template = NewNoteCommandFlagSet.String("t", "default", "template to use")
+	newNoteBookFlag     = NewNoteCommandFlagSet.String("b", "work", "the book where note is created.")
+	newNoteTemplateFlag = NewNoteCommandFlagSet.String("t", "default", "template to use")
 )
 
 func NewNoteCreateRequest() pb.ZNoteRequest {
 	req := pb.ZNoteRequest{}
 	req.Command = "new"
-	req.Book = *bookFlag
+	req.Book = *newNoteBookFlag
 	return req
 }
 
 func ResolveNewNote(request pb.ZNoteRequest) pb.ZNoteResponse {
-	bookName := NewNoteCommandFlagSet.Arg(0)
+	bookName := request.Book
 	logrus.WithField("book", bookName).WithField("args", NewNoteCommandFlagSet.Args()).Info("Create Note")
 	market := notesmarket.GetNotesMarket()
 	book := market.GetOrCreateBook(bookName)
 
-	var n notesmarket.Note = newNoteWithTemplate(*template)
+	var n notesmarket.Note = newNoteWithTemplate(*newNoteTemplateFlag)
 
 	go func() {
 		book.AddNote(n)
