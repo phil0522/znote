@@ -13,14 +13,14 @@ import (
 // multiple books, and each book may contains multiple notes.
 // Market is also responsible to serialize all notes to files and load them.
 type Market struct {
-	noteFiles map[string]*NoteFile
 	Books     map[string]*Book
+	PageBooks map[string]*PageBook
 }
 
 var (
 	marketInstance = &Market{
-		noteFiles: make(map[string]*NoteFile),
 		Books:     make(map[string]*Book),
+		PageBooks: make(map[string]*PageBook),
 	}
 )
 
@@ -33,6 +33,20 @@ func (m *Market) GetOrCreateBook(bookName string) *Book {
 	m.Books[book.Name] = book
 	return book
 }
+
+func (m *Market) GetOrCreatePageBook(bookName string) *PageBook {
+	if bookName != "tech" {
+		logrus.WithField("bookname", bookName).Panic("wrong page book name")
+	}
+	if book, ok := m.PageBooks[bookName]; ok {
+		return book
+	}
+	logrus.Warnf("create new book %s", bookName)
+	book := NewPageBook(bookName)
+	m.PageBooks[bookName] = book
+	return book
+}
+
 func (m *Market) SaveAll() {
 	for _, book := range m.Books {
 		book.saveToDisk()
@@ -44,27 +58,30 @@ func init() {
 }
 
 func (m *Market) loadAll() {
-	logrus.WithField("root", RootDir).Debug("load whole note market")
+	logrus.WithField("root", RootDir).Warn("load whole note market")
 	err := filepath.Walk(RootDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			logrus.Fatalf("error reading file %s", path)
 			return nil
 		}
-		if !isDataFile(path, info) {
+
+		if info.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
 		}
-
-		nf := NewNoteFile(path)
-		nf.load()
 
 		bookName := getBookName(path)
 		if bookName == "" || bookName == "tmp" {
 			return nil
+		} else if bookName == "tech" {
+			_ = m.GetOrCreatePageBook(bookName)
+		} else if isDataFile(path, info) {
+			book := m.GetOrCreateBook(bookName)
+			nf := NewNoteFile(path)
+			nf.load()
+			book.noteFiles[path] = nf
+			book.Notes.mergeNoteSet(nf.notes)
 		}
-		book := m.GetOrCreateBook(bookName)
 
-		book.noteFiles[path] = nf
-		book.Notes.mergeNoteSet(nf.notes)
 		return nil
 	})
 

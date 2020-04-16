@@ -42,5 +42,11 @@ func updateToc() {
 		book.UpdateBook()
 	}
 
+	for name, book := range market.PageBooks {
+		fmt.Fprintln(f, name)
+		book.ReloadAll()
+		book.UpdateToc()
+	}
+
 	maybeSubmit()
 }

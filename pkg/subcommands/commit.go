@@ -10,18 +10,19 @@ import (
 )
 
 func maybeSubmit() {
-	cmdStr := fmt.Sprintf("cd %s && git commit -a -m auto-submit", notesmarket.RootDir)
+	cmdStr := fmt.Sprintf("cd %s && if [[ `git status --porcelain` ]]; then git add . ; git commit -a -m auto-submit; fi", notesmarket.RootDir)
 
 	cmd := exec.Command("/bin/zsh", "-c", cmdStr)
 
-	if err := cmd.Run(); err != nil {
-		logrus.WithError(err).Warn("Failed to commit")
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		logrus.WithError(err).Warnf("Failed to commit\n%s\n", string(bytes))
 	}
 	maybePush()
+	logrus.Debug("submit changes")
 }
 
 func maybePush() {
-	r := rand.Intn(100)
+	r := rand.Intn(10000000)
 	if r != 75 {
 		return
 	}
@@ -29,7 +30,8 @@ func maybePush() {
 
 	cmd := exec.Command("/bin/zsh", "-c", cmdStr)
 
-	if err := cmd.Run(); err != nil {
-		logrus.WithError(err).Warn("Failed to push")
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		logrus.WithError(err).Warnf("Failed to push\n%s\n", string(bytes))
 	}
+	logrus.Debug("push commits to server")
 }
