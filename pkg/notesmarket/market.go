@@ -18,10 +18,7 @@ type Market struct {
 }
 
 var (
-	marketInstance = &Market{
-		Books:     make(map[string]*Book),
-		PageBooks: make(map[string]*PageBook),
-	}
+	marketInstance *Market = nil
 )
 
 func (m *Market) GetOrCreateBook(bookName string) *Book {
@@ -51,10 +48,6 @@ func (m *Market) SaveAll() {
 	for _, book := range m.Books {
 		book.saveToDisk()
 	}
-}
-
-func init() {
-	marketInstance.loadAll()
 }
 
 func (m *Market) loadAll() {
@@ -124,5 +117,12 @@ func getBookName(path string) string {
 }
 
 func GetNotesMarket() *Market {
+	if marketInstance == nil {
+		marketInstance = &Market{
+			Books:     make(map[string]*Book),
+			PageBooks: make(map[string]*PageBook),
+		}
+		marketInstance.loadAll()
+	}
 	return marketInstance
 }

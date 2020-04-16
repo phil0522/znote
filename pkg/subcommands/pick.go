@@ -60,7 +60,7 @@ func invokeFzfAndGetBookNoteId() string {
 
 	go func() {
 		if err := cmd2.Wait(); err != nil {
-			logrus.WithError(err).Panic("failed to wait cmd2")
+			logrus.WithError(err).Warn("failed to wait cmd2")
 		}
 	}()
 
