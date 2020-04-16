@@ -27,7 +27,7 @@ func ResolveListNote(req pb.ZNoteRequest) pb.ZNoteResponse {
 	for k, v := range market.Books {
 		logrus.WithField("book", k).Debug("Book")
 		for _, note := range v.Notes.ToOrderedList() {
-			fmt.Fprintf(sb, "%s,%s,%s\n", k, note.Id, note.Title)
+			fmt.Fprintf(sb, "%s,%s,%s,%s\n", k, note.Id, note.Title, strings.Join(note.Tags, " "))
 		}
 	}
 	resp := pb.ZNoteResponse{}
