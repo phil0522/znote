@@ -40,7 +40,17 @@ func (b *Book) EditNote(n Note) bool {
 		return false
 	}
 	b.RemoveNote(&n)
-	b.AddNote(*updated)
+	if updated.Id == IdToRemove {
+		return true
+	}
+
+	if updated.Project != "" && updated.Project != b.Name {
+		otherBook := GetNotesMarket().GetOrCreateBook(updated.Project)
+		otherBook.AddNote(*updated)
+		otherBook.saveToDisk()
+	} else {
+		b.AddNote(*updated)
+	}
 	return true
 }
 

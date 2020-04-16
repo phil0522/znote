@@ -27,7 +27,8 @@ func EmptyNote() Note {
 }
 
 const (
-	znoteLinePrefix = "znote:"
+	znoteLinePrefix = "znote: "
+	IdToRemove      = "removed"
 )
 
 func (n *Note) parseContent() {
@@ -54,7 +55,9 @@ func (n *Note) parseContent() {
 			}
 		}
 		if stage == "body" {
-			realContent = append(realContent, line)
+			if !n.consumeInlineInstruction(line) {
+				realContent = append(realContent, line+"\n")
+			}
 		}
 	}
 
@@ -63,6 +66,34 @@ func (n *Note) parseContent() {
 	if n.Id == "" {
 		n.Id = generateNextId()
 	}
+}
+
+func (n *Note) consumeInlineInstruction(line string) bool {
+	// All instructions start from z
+	if !strings.HasPrefix(line, "z") {
+		return false
+	}
+
+	fields := strings.SplitN(line, " ", 2)
+	key := fields[0]
+	value := ""
+	if len(fields) > 1 {
+		value = strings.TrimSpace(fields[1])
+	}
+
+	switch key {
+	case "zdel":
+		n.Id = IdToRemove
+	case "ztag":
+		if value != "" {
+			n.Tags = append(n.Tags, value)
+		}
+	case "zbook":
+		n.Project = value
+	default:
+		return false
+	}
+	return true
 }
 
 func (n *Note) updateFromPropertiesLine(line string) {
