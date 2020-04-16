@@ -81,6 +81,7 @@ func (nf *NoteFile) save() {
 	for _, note := range notes {
 		fmt.Fprintln(f, note.contentToSave())
 	}
+	nf.changed = false
 }
 
 func NewNoteFile(notePath string) *NoteFile {

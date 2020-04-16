@@ -35,6 +35,7 @@ func ResolveNewNote(request pb.ZNoteRequest) pb.ZNoteResponse {
 		book.AddNote(n)
 		if book.EditNote(n) {
 			market.SaveAll()
+			maybeSubmit()
 		} else {
 			book.RemoveNote(&n)
 		}

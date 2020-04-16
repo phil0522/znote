@@ -41,4 +41,6 @@ func updateToc() {
 		fmt.Fprintln(f, name)
 		book.UpdateBook()
 	}
+
+	maybeSubmit()
 }

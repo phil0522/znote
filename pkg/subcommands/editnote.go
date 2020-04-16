@@ -36,6 +36,7 @@ func ResolveEditNote(req pb.ZNoteRequest) pb.ZNoteResponse {
 				note := book.Notes.GetNote(noteId)
 				book.EditNote(note)
 				market.SaveAll()
+				maybeSubmit()
 			}()
 		}
 	}
