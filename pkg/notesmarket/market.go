@@ -58,7 +58,7 @@ func (m *Market) loadAll() {
 		nf.load()
 
 		bookName := getBookName(path)
-		if bookName == "" {
+		if bookName == "" || bookName == "tmp" {
 			return nil
 		}
 		book := m.GetOrCreateBook(bookName)

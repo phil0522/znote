@@ -28,7 +28,7 @@ func init() {
 	logrus.SetOutput(os.Stderr)
 
 	// Only log the warning severity or above.
-	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetLevel(logrus.InfoLevel)
 }
 
 const (

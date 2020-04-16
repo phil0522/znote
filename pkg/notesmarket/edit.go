@@ -11,7 +11,10 @@ import (
 
 // Creates a temporary file and open external editor to edit, load the edit content
 func editNote(note *Note) *Note {
-	tmpFilePath := filepath.Join(RootDir, "edit.md")
+	if note.Id == "" {
+		logrus.Panic("note id can not be empty")
+	}
+	tmpFilePath := filepath.Join(RootDir, "tmp", note.Id+".md")
 	nf := NewNoteFile(tmpFilePath)
 
 	nf.notes.upsertNode(*note)

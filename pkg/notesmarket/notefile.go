@@ -75,7 +75,7 @@ func (nf *NoteFile) save() {
 	defer f.Close()
 
 	// Edit.md is used to create temporary md file.
-	if fileName != "edit" {
+	if !strings.Contains(nf.notePath, string(os.PathSeparator)+"tmp"+string(os.PathSeparator)) {
 		fmt.Fprintf(f, "# %s\n\n", fileName)
 	}
 	for _, note := range notes {
