@@ -46,14 +46,16 @@ const (
 	serverAddr = "127.0.0.1:6399"
 )
 
-func killServer(ctx context.Context, client pb.ZNoteServiceClient) {
+func killServer(client pb.ZNoteServiceClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	_, err := client.QuitServer(ctx, &pb.QuitServerRequest{})
 	if err != nil {
 		log.Fatalf("failed to quit server rpc %s", err.Error())
 	}
 }
 
-func clientCall(callback func(context.Context, pb.ZNoteServiceClient)) {
+func clientCall(callback func(pb.ZNoteServiceClient)) {
 	conn, err := grpc.Dial(serverAddr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to create connection, %s", err.Error())
@@ -61,9 +63,7 @@ func clientCall(callback func(context.Context, pb.ZNoteServiceClient)) {
 
 	client := pb.NewZNoteServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	callback(ctx, client)
+	callback(client)
 }
 
 func serve() {
@@ -87,7 +87,7 @@ func serve() {
 	_ = grpcServer.Serve(lis)
 }
 
-func executeNoteRequest(ctx context.Context, client pb.ZNoteServiceClient) {
+func executeNoteRequest(client pb.ZNoteServiceClient) {
 	for _, command := range subcommands.Commands {
 		if command.Name == os.Args[1] {
 			err := command.Flagset.Parse(os.Args[2:])
@@ -99,6 +99,8 @@ func executeNoteRequest(ctx context.Context, client pb.ZNoteServiceClient) {
 				logrus.Debug("empty command, doing nothing")
 				return
 			}
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
 			resp, err := client.ExecuteCommand(ctx, &req)
 			if err != nil {
 				logrus.WithError(err).WithField("req", req).Panic("Failed to execute request")
