@@ -39,7 +39,7 @@ func invokeFzfAndGetBookNoteId() string {
 
 	cmd1 := exec.Command("znote", "list")
 	//cmd2 := exec.Command("fzf")
-	cmd2 := exec.Command("fzf", "--height", "50%", "--border", "-d,", "--preview", "znote show {2}", "--color", "fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229")
+	cmd2 := exec.Command("fzf", "--height", "50%", "--border", "-d,", "--preview", "znote show --preview {2}", "--color", "fg:-1,bg:-1,hl:230,fg+:3,bg+:233,hl+:229")
 
 	cmd1.Stdout = cmd1Output
 	cmd2.Stdin = cmd2Input

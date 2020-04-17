@@ -31,5 +31,6 @@ var (
 		makeSubCommand("serve", ServeCommandFlagSet, CreateServeRequest, ResolveServe),
 		makeSubCommand("refresh", RefreshCommandFlagSet, CreateRefreshMarketRequest, ResolveRefreshMarket),
 		makeSubCommand("show", ShowNoteCommandFlagSet, CreateShowNoteRequest, ResolveShowNote),
+		makeSubCommand("preview", ShowNoteCommandFlagSet, CreateShowNoteRequest, ResolveShowNote),
 	}
 )
