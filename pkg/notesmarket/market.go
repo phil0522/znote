@@ -126,3 +126,13 @@ func GetNotesMarket() *Market {
 	}
 	return marketInstance
 }
+
+func (m *Market) Reload() {
+	for k := range m.Books {
+		delete(m.Books, k)
+	}
+	for k := range m.PageBooks {
+		delete(m.PageBooks, k)
+	}
+	m.loadAll()
+}

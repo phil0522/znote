@@ -29,6 +29,7 @@ func ResolveRefreshMarket(req pb.ZNoteRequest) pb.ZNoteResponse {
 func updateToc() {
 	logrus.Debug("update toc")
 	market := notesmarket.GetNotesMarket()
+	market.Reload()
 
 	f, err := os.Create(filepath.Join(notesmarket.RootDir, "root.toc"))
 
