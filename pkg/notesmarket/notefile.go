@@ -79,7 +79,7 @@ func (nf *NoteFile) save() {
 		fmt.Fprintf(f, "# %s\n\n", fileName)
 	}
 	for _, note := range notes {
-		fmt.Fprintln(f, note.contentToSave())
+		fmt.Fprint(f, note.contentToSave())
 	}
 	nf.changed = false
 }

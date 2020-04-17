@@ -61,7 +61,7 @@ func (n *Note) parseContent() {
 		}
 	}
 
-	n.Content = strings.Join(realContent, "")
+	n.Content = strings.TrimRight(strings.Join(realContent, ""), "\n") + "\n"
 
 	if n.Id == "" {
 		n.Id = generateNextId()

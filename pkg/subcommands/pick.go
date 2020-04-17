@@ -19,6 +19,10 @@ var (
 func CreatePickNoteRequest() pb.ZNoteRequest {
 	noteId := invokeFzfAndGetBookNoteId()
 
+	if noteId == "" {
+		return pb.ZNoteRequest{}
+	}
+
 	return pb.ZNoteRequest{
 		Command: "edit",
 		NoteId:  noteId,

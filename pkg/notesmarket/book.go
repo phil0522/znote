@@ -30,6 +30,7 @@ func (b *Book) RemoveNote(n *Note) {
 	notePath := b.getFilePathFromCreationTime(n.CreationTime)
 	nf := b.noteFiles[notePath]
 	nf.notes.removeNoteByKey(n.Id)
+	nf.changed = true
 	b.Notes.removeNoteByKey(n.Id)
 }
 
