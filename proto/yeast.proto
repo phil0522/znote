@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package phil0522.znote;
+
+import "google/protobuf/timestamp.proto";
+
+message YTag {
+  string name = 1;
+
+  // archived is not shown in suggestion list.
+  bool archived = 2;
+  // Other tags the tag should also be considered to be.
+  repeated string implicit_tags = 3;
+}
+
+message YNote {
+  string id = 1;
+  string title = 2;
+  string summary = 3;
+  string content = 4;
+  repeated string tags = 5;
+  repeated string implicit_tags = 6;
+  google.protobuf.Timestamp created_time = 7;
+  google.protobuf.Timestamp updated_time = 8;
+  bool archived = 9;
+}
+
+message YeastUpsertTagRequest {
+  YTag ytag = 1;
+}
+message YeastUpsertTagResponse {
+  string status = 1;  // if success, returns ok. otherwise the error message.
+}
+
+message YeastListTagsRequest {}
+message YeastListTagsResponse {
+  repeated YTag ytag = 1;
+}
+
+message YeastUpsertNoteRequest {
+  YNote ynote = 1;
+}
+message YeastUpsertNoteResponse {
+  string status = 1;  // if success, returns ok. otherwise the error message.
+}
+message YeastListNoteRequest {
+  // How the response will be used, by default, only recently notes be retruned
+  // No content is returned.
+  string usage = 1;
+}
+message YeastListNoteResponse {
+  repeated YNote ynote = 1;
+}
+
+// The service for yeast client
+service YeastService {
+  rpc upsertTag(YeastUpsertTagRequest) returns (YeastUpsertTagResponse) {}
+  rpc ListTags(YeastListTagsRequest) returns (YeastListTagsRequest) {}
+  rpc upsertNote(YeastUpsertTagResponse) returns (YeastUpsertNoteResponse) {};
+  rpc ListNotes(YeastListNoteRequest) returns (YeastListNoteResponse) {}
+}

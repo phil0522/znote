@@ -1,4 +1,4 @@
-//go:generate protoc --go_out=plugins=grpc:. proto/service.proto
+//go:generate protoc --go_out=plugins=grpc:. --grpc-web_out=import_style=typescript,mode=grpcwebtext:. proto/service.proto proto/yeast.proto
 
 package main
 
