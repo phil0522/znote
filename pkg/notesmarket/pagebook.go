@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/phil0522/znote/pkg/config"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,8 +26,8 @@ func NewPageBook(name string) *PageBook {
 
 func (pb *PageBook) ReloadAll() {
 	pb.Pages = make(map[string]string)
-	logrus.WithField("root", RootDir).Debug("load page book")
-	bookRoot := filepath.Join(RootDir, pb.Name)
+	logrus.WithField("root", config.RootDir).Debug("load page book")
+	bookRoot := filepath.Join(config.RootDir, pb.Name)
 	err := filepath.Walk(bookRoot, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			logrus.WithError(err).WithField("path", path).Fatal("error reading file")
@@ -68,7 +69,7 @@ func (pb *PageBook) loadPage(path string) {
 }
 
 func (pb *PageBook) UpdateToc() {
-	logrus.WithField("root", RootDir).Debug("Update toc")
+	logrus.WithField("root", config.RootDir).Debug("Update toc")
 
 	keys := make([]string, 0, len(pb.Pages))
 	for key := range pb.Pages {
@@ -79,7 +80,7 @@ func (pb *PageBook) UpdateToc() {
 	})
 
 	lastDir := ""
-	f, err := os.Create(filepath.Join(RootDir, pb.Name, pb.Name+".toc"))
+	f, err := os.Create(filepath.Join(config.RootDir, pb.Name, pb.Name+".toc"))
 
 	if err != nil {
 		logrus.WithError(err).Panic("failed to update book toc")
@@ -88,7 +89,7 @@ func (pb *PageBook) UpdateToc() {
 	defer f.Close()
 
 	for _, path := range keys {
-		relPath, _ := filepath.Rel(filepath.Join(RootDir, pb.Name), path)
+		relPath, _ := filepath.Rel(filepath.Join(config.RootDir, pb.Name), path)
 		baseDir, _ := filepath.Split(relPath)
 		if baseDir != lastDir {
 			if !strings.HasSuffix(relPath, "README.md") {

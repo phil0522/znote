@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/phil0522/znote/pkg/config"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/ini.v1"
 )
@@ -18,7 +19,7 @@ var (
 )
 
 func init() {
-	iniPath = filepath.Join(RootDir, "znote.ini")
+	iniPath = filepath.Join(config.RootDir, "znote.ini")
 
 	var err error
 	cfg, err = ini.LoadSources(ini.LoadOptions{Loose: true}, iniPath)

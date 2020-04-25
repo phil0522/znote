@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/phil0522/znote/pkg/config"
 	"github.com/sirupsen/logrus"
 )
 
@@ -51,8 +52,8 @@ func (m *Market) SaveAll() {
 }
 
 func (m *Market) loadAll() {
-	logrus.WithField("root", RootDir).Warn("load whole note market")
-	err := filepath.Walk(RootDir, func(path string, info os.FileInfo, err error) error {
+	logrus.WithField("root", config.RootDir).Warn("load whole note market")
+	err := filepath.Walk(config.RootDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			logrus.Fatalf("error reading file %s", path)
 			return nil
@@ -102,7 +103,7 @@ func isDataFile(path string, info os.FileInfo) bool {
 }
 
 func getBookName(path string) string {
-	relativePath, err := filepath.Rel(RootDir, path)
+	relativePath, err := filepath.Rel(config.RootDir, path)
 	if err != nil {
 		logrus.WithField("path", path).Fatal("Failed to calculate relative path")
 		return ""

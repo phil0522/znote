@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/phil0522/znote/pkg/config"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,13 +14,13 @@ func (b *Book) getFilePathFromCreationTime(timeValue string) string {
 		logrus.WithField("time", timeValue).Fatal("failed to parse creation time")
 		return ""
 	}
-	return filepath.Join(RootDir, b.Name, "ByMonth", currentTime.Format("200601.md"))
+	return filepath.Join(config.RootDir, b.Name, "ByMonth", currentTime.Format("200601.md"))
 }
 
 func (b *Book) getFilePathForProject(project string) string {
-	return filepath.Join(RootDir, b.Name, "ByProject", project)
+	return filepath.Join(config.RootDir, b.Name, "ByProject", project)
 }
 
 func (b *Book) getFilePathForTag(tag string) string {
-	return filepath.Join(RootDir, b.Name, "ByTags", tag)
+	return filepath.Join(config.RootDir, b.Name, "ByTags", tag)
 }

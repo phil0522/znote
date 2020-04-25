@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/phil0522/znote/pkg/config"
 	"github.com/sirupsen/logrus"
 )
 
@@ -76,7 +77,7 @@ func (b *Book) saveToDisk() {
 }
 
 func (b *Book) UpdateBook() {
-	f, err := os.Create(filepath.Join(RootDir, b.Name, b.Name+".toc"))
+	f, err := os.Create(filepath.Join(config.RootDir, b.Name, b.Name+".toc"))
 
 	if err != nil {
 		logrus.WithError(err).Panic("failed to update root.toc")
@@ -96,7 +97,7 @@ func (b *Book) UpdateBook() {
 }
 
 func (b *Book) getRelPath(p string) string {
-	bookBaseDir := filepath.Join(RootDir, b.Name)
+	bookBaseDir := filepath.Join(config.RootDir, b.Name)
 	relPath, err := filepath.Rel(bookBaseDir, p)
 	if err != nil {
 		logrus.WithField("base", bookBaseDir).WithField("path", p).Panic("can not get relative path")
@@ -131,7 +132,7 @@ func (b *Book) UpdateTags() map[string][]*Note {
 	}
 
 	for tag, notes := range noteByTags {
-		noteFile := NewNoteFile(filepath.Join(RootDir, b.Name, "ByTag", strings.ToLower(tag)+".md"))
+		noteFile := NewNoteFile(filepath.Join(config.RootDir, b.Name, "ByTag", strings.ToLower(tag)+".md"))
 		noteFile.notes.mergeNotes(notes)
 		noteFile.changed = true
 		noteFile.save()

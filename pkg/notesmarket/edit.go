@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/phil0522/znote/config"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,7 +15,7 @@ func editNote(note *Note) *Note {
 	if note.Id == "" {
 		logrus.Panic("note id can not be empty")
 	}
-	tmpFilePath := filepath.Join(RootDir, "tmp", note.Id+".md")
+	tmpFilePath := filepath.Join(config.RootDir, "tmp", note.Id+".md")
 	nf := NewNoteFile(tmpFilePath)
 
 	nf.notes.upsertNode(*note)
